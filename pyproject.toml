@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "authwave"
+version = "1.0.0"
+description = "Authwave authentication client for Python applications"
+requires-python = ">=3.10"
+dependencies = ["PyNaCl>=1.5,<2"]
+
+[project.optional-dependencies]
+flask = ["flask>=2.3"]
+django = ["django>=4.2"]
+fastapi = ["fastapi>=0.100"]
+test = ["pytest>=7", "httpx>=0.24", "flask>=2.3", "django>=4.2", "fastapi>=0.100", "build>=1", "ruff>=0.9"]
+
+[tool.setuptools.packages.find]
+include = ["authwave*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
