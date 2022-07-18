@@ -48,7 +48,7 @@ class Fernet2(Fernet) :
         padded_data = padder.update(data) + padder.finalize()
         encryptor = Cipher(
             algorithms.AES(self._encryption_key),
-            modes.CTR(iv),
+            modes.CTR(iv), ## changed from CBC to CTR
         ).encryptor()
         ciphertext = encryptor.update(padded_data) + encryptor.finalize()
 
@@ -84,7 +84,7 @@ class Fernet2(Fernet) :
         iv = data[9:25]
         ciphertext = data[25:-32]
         decryptor = Cipher(
-            algorithms.AES(self._encryption_key), modes.CTR(iv)
+            algorithms.AES(self._encryption_key), modes.CTR(iv) ## changed from CBC to CTR
         ).decryptor()
         plaintext_padded = decryptor.update(ciphertext)
         try:
