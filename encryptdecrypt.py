@@ -33,7 +33,7 @@ class Fernet2(Fernet) :
 
     def encrypt_at_time(self, data: bytes, current_time: int) -> bytes:
         # double the iv length to go from 128bit to 256 bit encryption
-        #iv = os.urandom(16) # changed 16 -> 32 
+        #iv = os.urandom(16)
         iv = b'\xdc\x95M\xf3\x14\x8bb\xa0-\x06p\x0e\x19\xf5\x84\xb9' 
         # hex: 'dc954df3148b62a02d06700e19f584b9'
         # b'\xdc\x95M\xf3\x14\x8bb\xa0-\x06p\x0e\x19\xf5\x84\xb9'
