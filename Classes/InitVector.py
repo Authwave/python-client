@@ -4,9 +4,9 @@ import copy
 
 class InitVector():
 
-    _bytes = None
+    bytes = None
 
-    def __init__(self, bytelength = s.crypto_box_NONCEBYTES):
+    def __init__(self, bytelength = s.crypto_secretbox_NONCEBYTES):
         if bytelength < 1:
             # TODO: Raise CipherException: IV byte length must be greater than 1
             pass

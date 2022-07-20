@@ -2,12 +2,11 @@ import pysodium as s
 
 from Classes.AbstractMessage import AbstractMessage
 from Classes.PlainTextMessage import PlainTextMessage
-from Classes.KeyPair import KeyPair
+from Classes.Key import Key
 
 class EncryptedMessage(AbstractMessage):
     
-    def decrypt(self, receiverPrivateKey, senderPublicKey):
-        unlockingKeyPair = KeyPair(receiverPrivateKey, senderPublicKey)
-        decrypted = s.crypto_box_open_afternm(self._data, self._iv.getBytes(), unlockingKeyPair)
+    def decrypt(self, sharedKey):
+        decrypted = s.crypto_secretbox_open(self.data, self._iv.getBytes(), sharedKey.getBytes())
 
-        return PlainTextMessage(decrypted, self._iv)
+        return PlainTextMessage(decrypted.decode(), self._iv)
