@@ -1,14 +1,16 @@
 import os
 import base64
+import sys
+print(sys.path)
 import pysodium as s
 
-from Classes.EncryptedMessage import EncryptedMessage
-from Classes.PlainTextMessage import PlainTextMessage
+from Cipher.EncryptedMessage import EncryptedMessage
+from Cipher.PlainTextMessage import PlainTextMessage
 
-from Classes.Key import Key
+from Cipher.Key import Key
 
 sharedKey = Key()
-message = PlainTextMessage(2)
+message = PlainTextMessage("This is the test message @~::>>>?>><<")
 
 print("Message to send: " + str(message))
 
@@ -21,7 +23,7 @@ print("Shared Key: " + str(base64.b64encode(sharedKey.getBytes())))
 print("IV: " + str(base64.b64encode(message.getIv().getBytes())))
 print("Cipher: " + str(base64.b64encode(cipherText.getBytes())))
 
-encryptedMessage = EncryptedMessage(cipherText.getBytes(), message.getIv())
+encryptedMessage = EncryptedMessage(base64.b64encode(cipherText.getBytes()), message.getIv())
 decryptedMessage = encryptedMessage.decrypt(sharedKey)
 
 print(str(decryptedMessage))

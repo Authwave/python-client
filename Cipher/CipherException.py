@@ -1,0 +1,2 @@
+class CipherException(RuntimeError):
+    pass
