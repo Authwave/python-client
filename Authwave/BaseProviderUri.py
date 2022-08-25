@@ -1,7 +1,6 @@
 from urllib import parse
 import re
 import base64
-import requests
 
 from Authwave.InsecureProtocolException import InsecureProtocolException
 from Authwave.PortOutOfBoundsException import PortOutOfBoundsException

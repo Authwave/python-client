@@ -13,7 +13,6 @@ from Authwave.Authenticator import Authenticator
 from Authwave.SessionNotDictLikeException import SessionNotDictLikeException
 # from Authwave.GlobalSessionContainer import GlobalSessionContainer
 # from Authwave.MySessionArrayWrapper import MySessionArrayWrapper
-from Authwave.RedirectHandler import RedirectHandler
 from Authwave.SessionData import SessionData
 from Authwave.LoginUri import LoginUri
 from Authwave.BaseProviderUri import BaseProviderUri

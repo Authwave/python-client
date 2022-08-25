@@ -3,7 +3,7 @@ import pysodium as s
 import inspect
 import ctypes
 import base64
-import requests
+import urllib
 
 from Authwave.Cipher.InitVector import InitVector
 from Authwave.Cipher.Key import Key
@@ -38,13 +38,15 @@ class CipherText():
     def getBytes(self):
         return self._bytes
 
-    def getURI(self, host):
+    def getQueryString(self, host):
         if not isinstance(host, str):
             raise TypeError("host must be of type str.")
         params = {
             "cipher": base64.urlsafe_b64encode(self.getBytes() + b"=="),
             "iv": base64.urlsafe_b64encode(self._iv.getBytes() + b"==")
         }
-        request = requests.get(host, params=params)
-        return request.url
 
+        host += "?"
+        host += "cipher=" + urllib.parse.quote(params["cipher"].decode('utf-8'))
+        host += "&iv=" + urllib.parse.quote(params["iv"].decode('utf-8'))
+        return host
