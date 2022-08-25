@@ -6,3 +6,4 @@ Authwave/tests/__pycache__
 Authwave/Cipher/__pycache__
 */__pycache__/*
 .vscode
+*.pyc
