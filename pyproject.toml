@@ -1,0 +1,10 @@
+[project]
+
+name = "Authwave"
+version = "0.0.1"
+dependencies = [
+    "pysodium == 0.7.12"
+]
+
+[tool.setuptools.packages.find]
+exclude = ["authwave.tests"] # exclude tests directory
