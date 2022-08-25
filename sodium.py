@@ -4,10 +4,10 @@ import sys
 print(sys.path)
 import pysodium as s
 
-from Cipher.EncryptedMessage import EncryptedMessage
-from Cipher.PlainTextMessage import PlainTextMessage
+from Authwave.Cipher.EncryptedMessage import EncryptedMessage
+from Authwave.Cipher.PlainTextMessage import PlainTextMessage
 
-from Cipher.Key import Key
+from Authwave.Cipher.Key import Key
 
 sharedKey = Key()
 message = PlainTextMessage("This is the test message @~::>>>?>><<")
