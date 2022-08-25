@@ -2,5 +2,6 @@ Authwave/venv
 Authwave/venv2
 Authwave/.vscode
 Authwave/__pycache__
-Authwave/test/__pycache__
+Authwave/tests/__pycache__
+Authwave/Cipher/__pycache__
 .vscode
