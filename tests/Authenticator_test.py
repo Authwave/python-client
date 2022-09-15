@@ -20,20 +20,20 @@ from Authwave.Token import Token
 
 class AuthenticatorTest(unittest.TestCase):
     
-    @patch("RedirectHandler.RedirectHandler", autospec=True)
+    @patch("Authwave.RedirectHandler.RedirectHandler", autospec=True)
     def test_constructWithNoSession(self, redirectHandler):
 
         with self.assertRaises(TypeError):
             Authenticator("test-key", "/", redirectHandler=redirectHandler)
     
-    @patch("RedirectHandler.RedirectHandler", autospec=True)
+    @patch("Authwave.RedirectHandler.RedirectHandler", autospec=True)
     def test_constructWithNonDictSession(self, redirectHandler):
         session = "sessionid: 12, page: 3"
 
         with self.assertRaises(SessionNotDictLikeException):
             Authenticator("test-key", "/", session, redirectHandler)
 
-    @patch("RedirectHandler.RedirectHandler", autospec=True)
+    @patch("Authwave.RedirectHandler.RedirectHandler", autospec=True)
     def test_constructWithExistingSession(self, redirectHandler):
 
         sessiondata = {
@@ -45,7 +45,7 @@ class AuthenticatorTest(unittest.TestCase):
 
         self.assertEqual(sessiondata, authenticator._sessionObject)
 
-    @patch("RedirectHandler.RedirectHandler", autospec=True)
+    @patch("Authwave.RedirectHandler.RedirectHandler", autospec=True)
     def test_trackSessionChanges(self, redirectHandler):
 
         sessiondata = {
@@ -59,7 +59,7 @@ class AuthenticatorTest(unittest.TestCase):
 
         self.assertEqual(sessiondata, authenticator._sessionObject)
 
-    @patch("RedirectHandler.RedirectHandler", autospec=True)
+    @patch("Authwave.RedirectHandler.RedirectHandler", autospec=True)
     def test_isLoggedInFalseByDefault(self, redirectHandler):
         sessiondata = {
             "id": 34,
@@ -70,10 +70,10 @@ class AuthenticatorTest(unittest.TestCase):
 
         self.assertFalse(sut.isLoggedIn())
 
-    @patch("Token.Token", autospec=True)
-    @patch("UserResponseData.UserResponseData", autospec=True)
-    @patch("SessionData.SessionData", autospec=True)
-    @patch("RedirectHandler.RedirectHandler", autospec=True)
+    @patch("Authwave.Token.Token", autospec=True)
+    @patch("Authwave.UserResponseData.UserResponseData", autospec=True)
+    @patch("Authwave.SessionData.SessionData", autospec=True)
+    @patch("Authwave.RedirectHandler.RedirectHandler", autospec=True)
     def test_isLoggedInTrueWhenSessionDataSet(self, redirectHandler, sessionData, userResponseData, token):
        
         token = {
@@ -97,41 +97,84 @@ class AuthenticatorTest(unittest.TestCase):
 
         self.assertTrue(sut.isLoggedIn())
 
-    @patch("Token.Token", autospec=True)
-    @patch("RedirectHandler.RedirectHandler", autospec=True)
-    @patch("SessionData.SessionData", autospec=True)
-    def test_logoutCallsLogoutUri(self, sessionData, redirectHandler, token):
-       
-        token.generateRequestCipher.return_value = "example-request-cipher"
-        session = {
-            Authenticator.SESSION_KEY: sessionData
+
+    @patch("Authwave.RedirectHandler.RedirectHandler", autospec=True)
+    def test_logoutClearsSession(self, redirectHandler):
+
+        token = {
+            "key": b'11111111111111111111111111111111'
         }
-        session[Authenticator.SESSION_KEY].getToken.return_value = token
+        userData = {
+            "id": "ub92n3fwjnf39",
+            "email": "person@example.com",
+            "kvp": {}
+        }
+        
+        sessionDict = {}
+        sessionDict["token"] = token
+        sessionDict["data"] = userData
 
-        calledWith = []
-        def side_effect(*args, **kwargs):
-            calledWith.append(args)
-        redirectHandler.redirect = Mock(return_value=None, side_effect=side_effect)
+        session = {
+            Authenticator.SESSION_KEY: sessionDict
+        }
 
-        clientKey = os.urandom(s.crypto_secretbox_KEYBYTES)
-
-        sut = Authenticator(
-            clientKey,
-            "https://localhost/",
-            session,
-            redirectHandler
-        )
-
+        sut = Authenticator("test-key", "/", session, redirectHandler)
+        self.assertNotEqual({}, sut._sessionObject)
         sut.logout()
 
-        if calledWith[0][0]._host != "login.authwave.com":
-            self.fail()
-        query = calledWith[0][0].query
-        query = parse_qs(query)
-        sessionObj = session[Authenticator.SESSION_KEY]
-        tokenObj = sessionObj.getToken()
-        decrypted = token.decode(query[BaseProviderUri.QUERY_STRING_CIPHER])
-        self.assertNotEqual(session, {})
+        self.assertEqual({}, sut._sessionObject)
+
+
+####### THIS TEST IS COMMENTED OUT BECAUSE the logout method shouldn't actually call the redirect handler in Python.
+####### The developer is expected to handle logout redirects themselves (unlike the PHP implementation).
+####### This test remains here as an example of using side effects in unittest, as I'm sure they may be used elsewhere.
+    # @patch("Authwave.Token.Token", autospec=True)
+    # @patch("Authwave.RedirectHandler.RedirectHandler", autospec=True)
+    # def test_logoutCallsLogoutUri(self, redirectHandler, token):
+       
+    #     token = MagicMock(spec=Token)
+    #     token.generateRequestCipher.return_value = "example-request-cipher"
+    
+    #     token = {
+    #         "key": b'11111111111111111111111111111111'
+    #     }
+    #     userData = {
+    #         "id": "ub92n3fwjnf39",
+    #         "email": "person@example.com",
+    #         "kvp": {}
+    #     }
+    #     sessionData = {
+    #         "token": token,
+    #         "data": userData
+    #     }
+    #     session = {
+    #         Authenticator.SESSION_KEY: sessionData
+    #     }
+
+    #     calledWith = []
+    #     def side_effect(*args, **kwargs):
+    #         calledWith.append(args)
+    #     redirectHandler.redirect = Mock(return_value=None, side_effect=side_effect)
+
+    #     clientKey = os.urandom(s.crypto_secretbox_KEYBYTES)
+
+    #     sut = Authenticator(
+    #         clientKey,
+    #         "https://localhost/",
+    #         session,
+    #         redirectHandler
+    #     )
+
+    #     sut.logout()
+
+    #     if calledWith[0][0]._host != "login.authwave.com":
+    #         self.fail()
+    #     query = calledWith[0][0].query
+    #     query = parse_qs(query)
+    #     sessionObj = session[Authenticator.SESSION_KEY]
+    #     tokenObj = sessionObj.getToken()
+    #     decrypted = token.decode(query[BaseProviderUri.QUERY_STRING_CIPHER])
+    #     self.assertNotEqual(session, {})
     
 
     # @patch("Token.Token", autospec=True)

@@ -11,11 +11,11 @@ sys.path.append( os.path.abspath(os.path.dirname(__file__)+'/..') )
 import unittest
 from unittest.mock import Mock, MagicMock, patch
 
-from Cipher.DecryptionFailureException import DecryptionFailureException
-from InvalidUserDataSerializationException import InvalidUserDataSerializationException
-from UserResponseData import UserResponseData
-from Token import Token
-from Cipher.InitVector import InitVector
+from Authwave.Cipher.DecryptionFailureException import DecryptionFailureException
+from Authwave.InvalidUserDataSerializationException import InvalidUserDataSerializationException
+from Authwave.UserResponseData import UserResponseData
+from Authwave.Token import Token
+from Authwave.Cipher.InitVector import InitVector
 
 import pysodium as s
 
@@ -25,12 +25,12 @@ import json
 
 class TokenTest(unittest.TestCase):
     
-    def test_firstTest(self):
-        self.assertEqual(4, 4, "Something has gone terribly wrong")
+    # def test_firstTest(self):
+    #     self.assertEqual(4, 4, "Something has gone terribly wrong")
 
-    @unittest.expectedFailure
-    def test_wrongTest(self):
-        self.assertEqual(2, 4, "Maths is correct")
+    # @unittest.expectedFailure
+    # def test_wrongTest(self):
+    #     self.assertEqual(2, 4, "Maths is correct")
 
     def test_GenerateRequestCipher_sameForSameToken(self):
         token = Token("0" * 32)
@@ -51,7 +51,7 @@ class TokenTest(unittest.TestCase):
         self.assertNotEqual(cipher1._bytes, cipher2._bytes)
         self.assertNotEqual(cipher1._iv, cipher2._iv) 
 
-    @patch('Cipher.InitVector')
+    @patch('Authwave.Cipher.InitVector')
     def test_getIv(self, iv):
         sut = Token("", None, iv)
         sut_iv = sut.getIv()
@@ -63,8 +63,8 @@ class TokenTest(unittest.TestCase):
         with self.assertRaises(DecryptionFailureException):
             sut.decode("not a real cipher")
     
-    @patch("Cipher.InitVector", autospec=InitVector)
-    @patch("Cipher.InitVector", autospec=InitVector)
+    @patch("Authwave.Cipher.InitVector", autospec=InitVector)
+    @patch("Authwave.Cipher.InitVector", autospec=InitVector)
     def test_DecryptResponseCipherBadJson(self, sessionIv, iv):
         keyString = os.urandom(s.crypto_secretbox_KEYBYTES)
 
@@ -85,8 +85,8 @@ class TokenTest(unittest.TestCase):
         with self.assertRaises(InvalidUserDataSerializationException):
             sut.decode(base64Cipher)
 
-    @patch("Cipher.InitVector", autospec=InitVector)
-    @patch("Cipher.InitVector", autospec=InitVector)
+    @patch("Authwave.Cipher.InitVector", autospec=InitVector)
+    @patch("Authwave.Cipher.InitVector", autospec=InitVector)
     def test_DecryptResponseCipher(self, secretIv, iv):
         clientKeyBytes = b"0" * s.crypto_secretbox_KEYBYTES
         ivBytes = b"1" * s.crypto_secretbox_NONCEBYTES

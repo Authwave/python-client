@@ -62,20 +62,20 @@ class Authenticator:
         except:
             pass
         else:
-            if (data):
-                self._sessionData = data
+            self._sessionData = data
 
-                try:
-                    self._sessionData = SessionData.deserialize(self._sessionData)
-                    responseData = self._sessionData.getData()
-                    if (isinstance(responseData, UserResponseData)):
-                        self._user = User(
-                            responseData.getId(),
-                            responseData.getEmail(),
-                            responseData.getAllFields()
-                        )
-                except NotLoggedInException:
-                    pass
+            try:
+                self._sessionData = SessionData.deserialize(self._sessionData)
+                responseData = self._sessionData.getData()
+                # responseData = UserResponseData(responseData["id"], responseData["email"], responseData["kvp"])
+                if (isinstance(responseData, UserResponseData)):
+                    self._user = User(
+                        responseData.getId(),
+                        responseData.getEmail(),
+                        responseData.getAllFields()
+                    )
+            except NotLoggedInException:
+                pass
 
         # if (isinstance(currentUri, str)):
         #     currentUri = BaseProviderUri(currentUri)
