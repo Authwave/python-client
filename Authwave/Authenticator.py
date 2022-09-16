@@ -23,6 +23,7 @@ from Authwave.BaseProviderUri import BaseProviderUri
 from Authwave.Token import Token
 from Authwave.LoginUri import LoginUri
 from Authwave.LogoutUri import LogoutUri
+from Authwave.AdminUri import AdminUri
 
 import json
 # from GlobalSessionContainer import GlobalSessionContainer
@@ -77,9 +78,6 @@ class Authenticator:
             except NotLoggedInException:
                 pass
 
-        # if (isinstance(currentUri, str)):
-        #     currentUri = BaseProviderUri(currentUri)
-        # self._currentUri = currentUri
         self._currentUri = currentUri
 
         self._completeAuth()
@@ -129,8 +127,8 @@ class Authenticator:
             self._authwaveHost
         )
 
-    def getAdminUri(self):
-        raise NotImplementedError
+    # def getAdminUri(self):
+    #     raise NotImplementedError
 
     def getProfileUri(self):
         raise NotImplementedError
@@ -196,4 +194,18 @@ class Authenticator:
 
         return queryString[self.RESPONSE_QUERY_PARAMETER][0]
 
+    def getUser(self):
+        try:
+            return self._user
+        except:
+            raise NotLoggedInException
+
+    def getEmail(self):
+        try:
+            return self._user.email
+        except:
+            raise NotLoggedInException
+
+    def getAdminUri(self):
+        return AdminUri(self._authwaveHost)
 

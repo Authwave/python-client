@@ -39,7 +39,7 @@ class BaseProviderUri():
 
         return self
 
-    def buildQuery(self, token, currentPath, host, message = "",):
+    def buildQuery(self, token, currentPath, host, message = "", port = ""):
         cipher = token.generateRequestCipher(message)
 
         params = {
@@ -48,7 +48,10 @@ class BaseProviderUri():
             self.QUERY_STRING_CURRENT_PATH: str(currentPath).encode('utf-8').hex()
         }
         queryString = BaseProviderUri.querify(params)
-        return host + queryString
+        portString = ""
+        if port != "":
+            portString = ":" + portString
+        return host + portString + queryString
 
     def querify(params):
         out = "?"
@@ -165,6 +168,8 @@ class BaseProviderUri():
         out = ""
 
         out += self._scheme + "://" + self._host
+        if self._port != "" and self._port != None:
+            out += ":" + str(self._port)
         try:
             out += "?" + self.query
         except AttributeError:
@@ -186,7 +191,8 @@ class BaseProviderUri():
         newUri = uriHalves[0] + newQueryString
         return newUri
 
-
+    def getPath(self):
+        return self._path
 
     
 ## Need to decide how to do this. In the PHP client, Uri is a PhpGt class.

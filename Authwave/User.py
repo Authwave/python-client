@@ -1,3 +1,6 @@
+import this
+
+
 class User():
     def __init__(
         self, id, email, kvp
@@ -6,7 +9,7 @@ class User():
         self.email = email
         self._kvp = kvp
 
-    def getData(key):
+    def getData(self, key):
         # use key to return value in kvp
         # if failure, just return None
         try:
