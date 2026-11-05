@@ -59,8 +59,12 @@ class BaseProviderUri(Uri):
         parts = urlsplit(base if "://" in base else "https://" + base)
         if not parts.hostname:
             raise ValueError("Provider hostname is required")
+        is_test_http = parts.scheme == "http" and parts.hostname.lower().rstrip(
+            "."
+        ).endswith(".test")
         if (
             parts.hostname not in ("localhost", "127.0.0.127")
+            and not is_test_http
             and parts.scheme != "https"
         ):
             raise InsecureProtocolException(parts.scheme)

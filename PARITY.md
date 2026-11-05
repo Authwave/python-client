@@ -1,6 +1,6 @@
 # PHP client parity
 
-This Python client implements the current PHP identity contract (`id` and `email`), following PHP commit `bcb547d`. The language API uses snake_case methods, frozen dataclass user snapshots and request-scoped mappings.
+This Python client implements the current PHP identity contract (`id` and `email`), following PHP commit `b35909368b3bd78bb3c7401c694aef02d6a560dd`. The language API uses snake_case methods, frozen dataclass user snapshots and request-scoped mappings.
 
 | PHP source | Python equivalent |
 | --- | --- |
@@ -35,7 +35,7 @@ This Python client implements the current PHP identity contract (`id` and `email
 - Logout removes only authentication state before redirect. Explicit destinations override the configured return URI, then the provider default. Query-only destinations replace the current query.
 - Fake login stores synthetic data, appends its own response query and defers refreshing the current user until the redirected request. Only the default fake email takes the local logout branch.
 - The low-level token decoder uses the request IV and accepts `uuid` or `id`; the normal response path uses the secret session IV and `id`. Extra fields are ignored, matching the current PHP client.
-- Administration links point to `/admin/` and do not grant access. HTTPS is required except for `localhost` and the literal `127.0.0.127`.
+- Administration links point to `/admin/` and do not grant access. HTTPS is required except for `localhost`, the literal `127.0.0.127`, and HTTP providers with a `.test` hostname suffix.
 - The unused legacy session-store constant and deprecated user alias/getter are retained. Actual storage uses `Authwave\SessionData`.
 
 ## Runtime adaptations
@@ -47,3 +47,5 @@ Redirects transfer control to adapters, which save before sending a 303. Applica
 PHP dependency APIs such as the entire PSR-7 URI interface are not reimplemented; native language URI types/helpers provide the operations needed by the client. PHP's diagnostic logging and warning mechanisms use the host language's conventions. Browser login against a deployed provider is separate from the automated simulated-provider tests.
 
 Python emits `DeprecationWarning` for `get_user()`. Default redirects raise `RedirectSignal`. Optional Flask and Django decorators and ASGI/WSGI middleware buffer responses and use opaque cookies. FastAPI uses the ASGI middleware. Server-side store methods are synchronous; ASGI executes store operations and constructor callbacks in worker threads.
+
+Provider HTTP policy also allows the `.test` hostname suffix (case-insensitive, ignoring trailing DNS dots), for local test providers. The exception does not allow other schemes.
