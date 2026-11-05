@@ -1,6 +1,6 @@
 import json
 import warnings
-from urllib.parse import parse_qs
+from urllib.parse import parse_qs, urlsplit, urlunsplit, quote
 from .cipher import InitVector, CipherText, decrypt
 from .errors import NotLoggedInException, RedirectHandler
 from .session import GlobalSessionContainer, SessionData
@@ -178,9 +178,10 @@ class Authenticator:
         self._tidy_response_data(return_query)
 
     def _tidy_response_data(self, return_query: str | None = None) -> None:
-        uri = (
-            self._current_uri
-            if return_query is None
-            else self._current_uri.with_query(return_query)
-        )
+        parts = urlsplit(self._current_uri)
+        path = "/" + parts.path.lstrip("/")
+        path = quote(path, safe="/%:@!$&'()*+,;=-._~")
+        uri = Uri(urlunsplit(("", "", path, parts.query, parts.fragment)))
+        if return_query is not None:
+            uri = uri.with_query(return_query)
         self._redirect.redirect(uri.without_query_value(self.RESPONSE_QUERY_PARAMETER))
