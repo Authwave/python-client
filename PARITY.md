@@ -1,6 +1,6 @@
 # PHP client parity
 
-This Python client implements the current PHP identity contract (`id` and `email`), following PHP commit `b35909368b3bd78bb3c7401c694aef02d6a560dd`. The language API uses snake_case methods, frozen dataclass user snapshots and request-scoped mappings.
+This Python client implements the current PHP identity contract (`id` and `email`), following PHP commit `4dcc01fe5d07933400c82695bf9574097ee19d43`. The language API uses snake_case methods, frozen dataclass user snapshots and request-scoped mappings.
 
 | PHP source | Python equivalent |
 | --- | --- |
