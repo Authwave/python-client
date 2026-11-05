@@ -33,7 +33,7 @@ def test_missing_state():
         SessionData().get_token()
     with pytest.raises(NotLoggedInException):
         SessionData().get_data()
-    auth = Authenticator(KEY, "/", session=GlobalSessionContainer({}))
+    auth = Authenticator(KEY, "/", session=GlobalSessionContainer({}, lambda: None))
     with pytest.raises(NotLoggedInException):
         auth.get_auth_user()
     with pytest.warns(DeprecationWarning), pytest.raises(NotLoggedInException):
@@ -75,7 +75,7 @@ def test_tokens_and_decoding():
 def test_session_roundtrip_and_callback_failure():
     token = Token(SECRET)
     session = {}
-    container = GlobalSessionContainer(session)
+    container = GlobalSessionContainer(session, lambda: None)
     container.set(SessionData.STORE_KEY, SessionData(token, return_query="x=%7e&flag"))
     calls = []
 
@@ -91,7 +91,7 @@ def test_session_roundtrip_and_callback_failure():
     path = "/?AUTHWAVE_RESPONSE_DATA=" + quote_plus(cipher)
     with pytest.raises(RuntimeError):
         Authenticator(KEY, path, session=container, on_authenticated=callback)
-    restored = GlobalSessionContainer(json.loads(json.dumps(session)))
+    restored = GlobalSessionContainer(json.loads(json.dumps(session)), lambda: None)
     assert restored.get(SessionData.STORE_KEY).has_invoked_authentication_callback()
     record = Record()
     auth = Authenticator(
@@ -113,7 +113,7 @@ def test_fake_login_and_logout():
     auth = Authenticator(
         KEY,
         "/current?old=1",
-        session=GlobalSessionContainer(session),
+        session=GlobalSessionContainer(session, lambda: None),
         redirect_handler=record,
     )
     auth.fake_login("dev")
@@ -121,7 +121,7 @@ def test_fake_login_and_logout():
     next_auth = Authenticator(
         KEY,
         record.destinations[0][0],
-        session=GlobalSessionContainer(session),
+        session=GlobalSessionContainer(session, lambda: None),
         redirect_handler=record,
     )
     assert next_auth.get_auth_user().email == Authenticator.FAKE_EMAIL
@@ -132,7 +132,7 @@ def test_fake_login_and_logout():
 
 
 def test_default_redirect_and_admin():
-    auth = Authenticator(KEY, "/", session=GlobalSessionContainer({}))
+    auth = Authenticator(KEY, "/", session=GlobalSessionContainer({}, lambda: None))
     assert str(auth.get_admin_uri()) == "https://login.authwave.com/admin/"
     with pytest.raises(RedirectSignal) as result:
         auth.login()

@@ -16,6 +16,7 @@ from .session import GlobalSessionContainer
 class SessionStore(Protocol):
     def load(self, id: str) -> dict | None: ...
     def save(self, id: str, data: dict, expires_at: float) -> None: ...
+    def delete(self, id: str) -> None: ...
 
 
 class MemorySessionStore:
@@ -34,6 +35,10 @@ class MemorySessionStore:
                 del self._entries[id]
                 return None
             return copy.deepcopy(entry[1])
+
+    def delete(self, id: str) -> None:
+        with self._lock:
+            self._entries.pop(id, None)
 
     def save(self, id: str, data: dict, expires_at: float) -> None:
         # Reject non-JSON session values before committing anything.
@@ -69,15 +74,23 @@ class RequestSession:
             else None
         )
         self.id = candidate if stored is not None else secrets.token_hex(32)
-        self.data = stored if stored is not None else {}
-        self.container = GlobalSessionContainer(self.data)
+        self.data = copy.deepcopy(stored) if stored is not None else {}
+        self._previous_ids = []
+        self.container = GlobalSessionContainer(self.data, self.regenerate)
 
     def authenticator(self, path: str, auth_options: dict) -> Authenticator:
         return Authenticator(
             current_uri_path=path, session=self.container, **auth_options
         )
 
+    def regenerate(self) -> None:
+        new_id = secrets.token_hex(32)
+        self._previous_ids.append(self.id)
+        self.id = new_id
+
     def commit(self) -> None:
+        for old_id in self._previous_ids:
+            self.options.store.delete(old_id)
         self.options.store.save(
             self.id, self.data, time.time() + self.options.ttl_seconds
         )

@@ -108,6 +108,7 @@ class Authenticator:
     ) -> None:
         iv = InitVector()
         token = Token(self._secret, iv)
+        self._session.regenerate()
         self._session.set(SessionData.STORE_KEY, SessionData(token))
         data = UserResponseData(
             user_id, email if email is not None else self.FAKE_EMAIL
@@ -167,6 +168,8 @@ class Authenticator:
         if not isinstance(data, dict):
             raise TypeError("Expected authentication object")
         user_data = UserResponseData(scalar(data.get("id")), scalar(data.get("email")))
+        if not self.is_logged_in():
+            self._session.regenerate()
         self._user = User(user_data.id, user_data.email)
         was_invoked = self._session_data.has_invoked_authentication_callback()
         next_data = SessionData(token, user_data, return_query)

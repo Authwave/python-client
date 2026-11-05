@@ -5,6 +5,7 @@ from .cipher import InitVector, CipherText, decrypt
 from .errors import (
     AuthwaveException,
     SessionNotStartedException,
+    SessionRegenerationException,
     NotLoggedInException,
     InsecureProtocolException,
     InvalidUserDataSerializationException,
