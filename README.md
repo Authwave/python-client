@@ -21,6 +21,8 @@ def login(auth):
 
 Wrap the return route too. It can read `auth.is_logged_in()` and `auth.get_auth_user().id` / `.email`. The full [examples](examples) include login, logout and callback handling. See the [wiki](https://github.com/Authwave/python-client/wiki) for setup and the API reference.
 
+A token can encrypt only its first complete request. Repeating the same request is allowed; a different payload raises TokenReuseException. Create a fresh token for a different action or return query, and do not copy tokens or reuse supplied IVs. Session serialisation retains the binding. Tokens restored from older sessions without a binding can still decrypt responses, but require a fresh token to start another request.
+
 The complete provider-issued key belongs on the server. The final underscore separates the deployment identifier from the raw 32-byte secret. `authwave_host` defaults to `login.authwave.com`.
 
 `MemorySessionStore` is for development. Production applications need a shared persistent `SessionStore` and HTTPS; cookies are Secure by default. Authentication data stays in server-side storage; never put serialized tokens in browser cookies. Authentication callbacks are synchronous and run at most once per exchange under sequential session processing.
