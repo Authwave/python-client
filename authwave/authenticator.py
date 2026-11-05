@@ -68,6 +68,7 @@ class Authenticator:
         if self.is_logged_in():
             return
         token = token if token is not None else Token(self._secret)
+        login_uri = self.get_login_uri(token)
         self._session_data = SessionData(
             token,
             return_query=(
@@ -75,7 +76,7 @@ class Authenticator:
             ).get_query(),
         )
         self._session.set(SessionData.STORE_KEY, self._session_data)
-        self._redirect.redirect(self.get_login_uri(token))
+        self._redirect.redirect(login_uri)
 
     def logout(
         self, redirect_to: str | None = None, token: Token | None = None

@@ -11,6 +11,7 @@ from .errors import (
     ResponseCipherDecryptionException,
     DecryptionFailureException,
     EncryptionFailureException,
+    TokenReuseException,
     RedirectSignal,
     RedirectHandler,
 )
