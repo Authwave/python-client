@@ -110,11 +110,30 @@ def test_roundtrip(framework):
         client = Client(AuthwaveWSGI(app, options, client_key=KEY), Response)
         invoke = lambda path: client.get(path)
         body = lambda response: response.json
+    from http.cookies import SimpleCookie
+    import time
+
+    def session_id(response):
+        if framework == "django":
+            return response.cookies["authwave.sid"].value
+        values = SimpleCookie()
+        values.load(response.headers["Set-Cookie"])
+        return values["authwave.sid"].value
+
     initial = invoke("/login")
+    old_id = session_id(initial)
+    pending = store.load(old_id)
+    pending["basket"] = ["tea"]
+    store.save(old_id, pending, time.time() + 86400)
     assert initial.status_code == 303
     completed = invoke(provider_response(initial.headers["Location"]))
     assert completed.status_code == 303
+    new_id = session_id(completed)
+    assert new_id != old_id
+    assert store.load(old_id) is None
+    assert store.load(new_id)["basket"] == ["tea"]
     restored = invoke("/callback")
+    assert session_id(restored) == new_id
     assert body(restored) == {"loggedIn": True, "id": "user-id"}
     assert restored.headers["Cache-Control"] == "no-store"
     assert invoke("/logout").status_code == 303
@@ -176,6 +195,9 @@ def test_store_failure_prevents_wsgi_output():
     from authwave.integrations.wsgi import AuthwaveWSGI
 
     class FailingStore:
+        def delete(self, id):
+            pass
+
         def load(self, id):
             return None
 

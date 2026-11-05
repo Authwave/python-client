@@ -1,4 +1,8 @@
-from .errors import NotLoggedInException, SessionNotStartedException
+from .errors import (
+    NotLoggedInException,
+    SessionNotStartedException,
+    SessionRegenerationException,
+)
 from .token import Token
 from .user import UserResponseData, BaseResponseData
 
@@ -62,10 +66,11 @@ class SessionData:
 class GlobalSessionContainer:
     """Wrap an existing request-scoped mapping, never a process global."""
 
-    def __init__(self, data=None):
+    def __init__(self, data=None, regenerate=None):
         if data is None:
             raise SessionNotStartedException()
         self.data = data
+        self._regenerate = regenerate
 
     def get(self, key: str):
         value = self.data.get(key)
@@ -81,6 +86,11 @@ class GlobalSessionContainer:
 
     def remove(self, key: str) -> None:
         self.data.pop(key, None)
+
+    def regenerate(self) -> None:
+        if self._regenerate is None:
+            raise SessionRegenerationException("Supply a session regeneration callback")
+        self._regenerate()
 
 
 SessionArrayWrapper = GlobalSessionContainer

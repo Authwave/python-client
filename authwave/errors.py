@@ -43,3 +43,7 @@ class RedirectSignal(AuthwaveException):
 class RedirectHandler:
     def redirect(self, uri: str, code: int = 303) -> None:
         raise RedirectSignal(str(uri), code)
+
+
+class SessionRegenerationException(AuthwaveException):
+    pass

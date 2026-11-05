@@ -33,7 +33,7 @@ def test_php_parity(fixture):
         SECRET, InitVector().with_bytes(b"a" * 24), InitVector().with_bytes(b"f" * 24)
     )
     state = {"basket": ["tea"]}
-    session = GlobalSessionContainer(state)
+    session = GlobalSessionContainer(state, lambda: None)
     if c.get("state") == "pending":
         session.set(
             SessionData.STORE_KEY, SessionData(token, return_query=c.get("returnQuery"))

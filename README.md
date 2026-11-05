@@ -25,6 +25,8 @@ The complete provider-issued key belongs on the server. The final underscore sep
 
 `MemorySessionStore` is for development. Production applications need a shared persistent `SessionStore` and HTTPS; cookies are Secure by default. Authentication data stays in server-side storage; never put serialized tokens in browser cookies. Authentication callbacks are synchronous and run at most once per exchange under sequential session processing.
 
+Successful authentication replaces the session ID before saving the identity and invalidates the old ID. Other session data is preserved. Custom SessionStore implementations must provide delete(id), and custom GlobalSessionContainer mappings must supply a synchronous regeneration callback as the second argument. The callback must replace the ID, invalidate the old session and preserve the mapping; raising an exception stops authentication. Ordinary session restoration does not rotate the ID.
+
 ## Development
 
 ```bash
